@@ -31,6 +31,7 @@ interceptConsole();
 const spyEventSender = new SpyEventSender({
   log,
   logError,
+  scope: process.env['SSPY_ROOT_STACK']!,
 });
 
 // Wrap original handler.
@@ -41,6 +42,8 @@ export const handler = async (
   context: Context,
   callback: Callback
 ): Promise<any | undefined> => {
+  await spyEventSender.connect();
+
   const contextSpy: FunctionContext = {
     functionName: context.functionName,
     awsRequestId: context.awsRequestId,
@@ -143,6 +146,8 @@ export const handler = async (
         reject(error);
       })
     );
+  } finally {
+    await spyEventSender.close();
   }
 };
 

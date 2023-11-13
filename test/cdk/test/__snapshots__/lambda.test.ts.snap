@@ -235,7 +235,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3957015dd67c832692644e95d92196ff2ada39286e6e0ffe1240b6d3c4e7e127.zip",
+          "S3Key": "ac25b1f101fe4836a68801fbe2a100cf9e6c8f09e9eea368d4ada703700e81eb.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -250,6 +250,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             },
             "SSPY_FUNCTION_NAME": "FromSnsToSqsAndS3",
             "SSPY_INFRA_MAPPING": "{}",
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -393,6 +394,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
               },
             },
             Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
               "Action": Array [
                 "dynamodb:BatchWriteItem",
                 "dynamodb:PutItem",
@@ -487,7 +493,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "9ead32172ab355ca59de0a6e6aa6b042d9be0a18ebeb9797410aaabee61c98d3.zip",
+          "S3Key": "b5d23791a5e8900dea43b7a8fc4e872fa27312241b81c52c6fb120612a27b565.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -513,6 +519,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 ],
               ],
             },
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_SUBSCRIBED_TO_SQS": "true",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
@@ -613,6 +620,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                   "Arn",
                 ],
               },
+            },
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
             },
             Object {
               "Action": Array [
@@ -959,6 +971,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             "NODE_OPTIONS": "--enable-source-maps",
             "SSPY_FUNCTION_NAME": "ReceiveEventBridge",
             "SSPY_INFRA_MAPPING": "{}",
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -1033,6 +1046,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
             Object {
               "Action": Array [
                 "dynamodb:BatchWriteItem",
@@ -1151,6 +1169,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 ],
               ],
             },
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_SUBSCRIBED_TO_SQS": "true",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
@@ -1241,6 +1260,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                   "Arn",
                 ],
               },
+            },
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
             },
             Object {
               "Action": Array [
@@ -1641,7 +1665,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "1ae5bd4e741c0b4b5309e11738f23752e1bc35a43dffda96210f41c0e322a512.zip",
+          "S3Key": "441d4ba0275c1fea780c5c971263be04328b6f3226b16b30aa3ac74d4d4a7da4.zip",
         },
       },
       "Type": "AWS::Lambda::LayerVersion",
@@ -1656,7 +1680,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "b4b02377de150bf7e6dfe0fdc41c2e02d54f01740b28ddffc04701aea77173d4.zip",
+          "S3Key": "ce927a0735ba53c5e4604d17af1e536fd9de7f3fd549e4d01fc135f43c826386.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -1758,7 +1782,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e3398e4b8f1ae3417d5afa7ec1158778b906c8238d308303c7bf9a72726d8041.zip",
+          "S3Key": "7e243ff768f397efc80515b13dfa05e11218a612957f0282766c5c4b5b010e17.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -1850,6 +1874,21 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       },
       "Type": "AWS::IAM::Policy",
     },
+    "ServerlessSpyPythonExtension718A6034": Object {
+      "Properties": Object {
+        "CompatibleRuntimes": Array [
+          "python3.8",
+          "python3.9",
+        ],
+        "Content": Object {
+          "S3Bucket": Object {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "441d4ba0275c1fea780c5c971263be04328b6f3226b16b30aa3ac74d4d4a7da4.zip",
+        },
+      },
+      "Type": "AWS::Lambda::LayerVersion",
+    },
     "ServerlessSpyRuleAllMyEventBus059FF67A": Object {
       "Properties": Object {
         "EventBusName": Object {
@@ -1904,7 +1943,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "b9b766ecfb7a00b14e4605f25e02ebeeca0e85d9996a77cf5266884f16bc057e.zip",
+          "S3Key": "4d325f2542f87ff99c026f936b9c1231c3a72e0dab6b89a9859e00d4a3dec9fd.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -1936,6 +1975,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 ],
               ],
             },
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -2022,6 +2062,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
             Object {
               "Action": Array [
                 "dynamodb:BatchWriteItem",
@@ -2167,7 +2212,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "b9b766ecfb7a00b14e4605f25e02ebeeca0e85d9996a77cf5266884f16bc057e.zip",
+          "S3Key": "4d325f2542f87ff99c026f936b9c1231c3a72e0dab6b89a9859e00d4a3dec9fd.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -2185,6 +2230,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 ],
               ],
             },
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -2285,6 +2331,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
             Object {
               "Action": Array [
                 "dynamodb:BatchWriteItem",
@@ -2396,7 +2447,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "b9b766ecfb7a00b14e4605f25e02ebeeca0e85d9996a77cf5266884f16bc057e.zip",
+          "S3Key": "4d325f2542f87ff99c026f936b9c1231c3a72e0dab6b89a9859e00d4a3dec9fd.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -2414,6 +2465,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                 ],
               ],
             },
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -2503,6 +2555,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
             Object {
               "Action": Array [
                 "dynamodb:BatchWriteItem",
@@ -2618,7 +2675,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e7ff2a7516b279b0c0e4e115aaf1e813a8e6ba33e12b277bc85f15876a3f165b.zip",
+          "S3Key": "376d35a6c5cfc782b22df67e7d69314eb226a39a61ac5560102ce4aa7223928b.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -2633,6 +2690,7 @@ def submit_response(event: dict, context, response_status: str, error_message: s
             },
             "SSPY_FUNCTION_NAME": "ToSnsAndDynamoDb",
             "SSPY_INFRA_MAPPING": "{}",
+            "SSPY_ROOT_STACK": "Test",
             "SSPY_WS_ENDPOINT": Object {
               "Fn::Join": Array [
                 "",
@@ -2734,6 +2792,11 @@ def submit_response(event: dict, context, response_status: str, error_message: s
                   "Ref": "AWS::NoValue",
                 },
               ],
+            },
+            Object {
+              "Action": "iot:*",
+              "Effect": "Allow",
+              "Resource": "*",
             },
             Object {
               "Action": Array [

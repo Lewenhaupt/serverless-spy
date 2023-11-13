@@ -27,6 +27,7 @@ describe('Lambda to SQS', () => {
     serverlessSpyListener =
       await createServerlessSpyListener<ServerlessSpyEvents>({
         serverlessSpyWsUrl: output.ServerlessSpyWsUrl,
+        scope: 'ServerlessSpyLambdaToSqs',
       });
   });
 

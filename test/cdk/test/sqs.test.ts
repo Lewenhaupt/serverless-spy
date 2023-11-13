@@ -27,6 +27,7 @@ describe('SQS with option spySqsWithNoSubscriptionAndDropAllMessages', () => {
     serverlessSpyListener =
       await createServerlessSpyListener<ServerlessSpyEvents>({
         serverlessSpyWsUrl: output.ServerlessSpyWsUrl,
+        scope: 'ServerlessSpySqs',
       });
   });
 

@@ -27,6 +27,7 @@ describe('EsmLambda', () => {
     serverlessSpyListener =
       await createServerlessSpyListener<ServerlessSpyEvents>({
         serverlessSpyWsUrl: output.ServerlessSpyWsUrl,
+        scope: 'ServerlessSpyEsmLambda',
       });
   });
 

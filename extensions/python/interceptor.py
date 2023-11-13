@@ -2,7 +2,7 @@ import json
 import os
 
 import boto3
-from awscrt import auth, http, mqtt5
+from awscrt import auth, mqtt5
 from awsiot import mqtt_connection_builder
 from awslambdaric import bootstrap
 
@@ -54,14 +54,16 @@ def handler(event, context):
 
     # Future.result() waits until a result is available
     connect_future.result()
-    print(f'Connected!')
+    print('Connected!')
     mqtt_connection.publish(
         topic=spied_function_name,
         payload=json.dumps(
             {
-                'type': f'Function#{spied_function_name}#Request',
-                'request': event,
-                'context': context,
+                'serviceKey': f'Function#{spied_function_name}#Request',
+                'data': {
+                    'request': event,
+                    'context': context,
+                },
             }
         ),
         qos=mqtt5.QoS.AT_LEAST_ONCE,
@@ -72,13 +74,17 @@ def handler(event, context):
             topic=spied_function_name,
             payload=json.dumps(
                 {
-                    'type': f'Function#{spied_function_name}#Response',
-                    'request': event,
-                    'response': response,
-                    'context': context,
+                    'serviceKey': f'Function#{spied_function_name}#Response',
+                    'data': {
+                        'request': event,
+                        'response': response,
+                        'context': context,
+                    },
                 }
             ),
             qos=mqtt5.QoS.AT_LEAST_ONCE,
         )
     except Exception as e:
         print('error')
+        raise e
+    return response

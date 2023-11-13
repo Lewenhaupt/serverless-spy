@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as apiGwV2 from '@aws-cdk/aws-apigatewayv2-alpha';
 import * as apiGwV2Int from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
-import { CfnOutput, Duration, NestedStack, Stack } from 'aws-cdk-lib';
+import { aws_iam, CfnOutput, Duration, NestedStack, Stack } from 'aws-cdk-lib';
 import * as agw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as dynamoDb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
@@ -19,6 +19,7 @@ import * as snsSubs from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Construct, IConstruct } from 'constructs';
 import { envVariableNames } from './common/envVariableNames';
+import { Effect } from 'aws-cdk-lib/aws-iam';
 
 export interface ServerlessSpyProps {
   readonly generateSpyEventsFileLocation?: string;
@@ -39,6 +40,7 @@ export interface SpyFilter {
 
 export class ServerlessSpy extends Construct {
   private extensionLayer: lambda.LayerVersion;
+  // private pythonExtensionLayer: lambda.LayerVersion;
   private table: dynamoDb.Table;
   private webSocketApi: apiGwV2.WebSocketApi;
   private createdResourcesBySSpy: IConstruct[] = [];
@@ -67,6 +69,14 @@ export class ServerlessSpy extends Construct {
       code: lambda.Code.fromAsset(this.getExtensionAssetLocation()),
     });
     this.createdResourcesBySSpy.push(this.extensionLayer);
+
+    new lambda.LayerVersion(this, 'PythonExtension', {
+      compatibleRuntimes: [
+        lambda.Runtime.PYTHON_3_8,
+        lambda.Runtime.PYTHON_3_9,
+      ],
+      code: lambda.Code.fromAsset(this.getExtensionAssetLocation()),
+    });
 
     this.table = new dynamoDb.Table(this, 'WebSocket', {
       partitionKey: {
@@ -411,7 +421,7 @@ export class ServerlessSpy extends Construct {
       }
     );
     func.addEventSource(new SqsEventSource(queue));
-
+    this.setupForIoT(func);
     //
     func.addLayers(this.extensionLayer);
 
@@ -481,12 +491,17 @@ export class ServerlessSpy extends Construct {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: this.getAssetLocation('functions/sendMessage.js'),
+      bundling: {
+        buildArgs: {
+          platform: 'node',
+        },
+      },
       environment: {
         [envVariableNames.SSPY_WS_TABLE_NAME]: this.table.tableName,
         NODE_OPTIONS: '--enable-source-maps',
       },
     });
-
+    this.setupForIoT(func);
     this.table.grantWriteData(func);
     this.table.grantReadData(func);
     func.addEnvironment(
@@ -661,6 +676,20 @@ export class ServerlessSpy extends Construct {
     }
     return functionSubscription;
   }
+  private setupForIoT(func: lambda.Function) {
+    func.addEnvironment(
+      envVariableNames.SSPY_ROOT_STACK,
+      this.cleanName(this.findRootStack(Stack.of(this)).node.id)
+    );
+
+    func.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['iot:*'],
+        effect: Effect.ALLOW,
+        resources: ['*'],
+      })
+    );
+  }
 
   private internalSpyLambda(func: lambda.Function) {
     func.addLayers(this.extensionLayer);
@@ -682,6 +711,8 @@ export class ServerlessSpy extends Construct {
       func.addEnvironment(envVariableNames.SSPY_DEBUG, 'true');
     }
 
+    this.setupForIoT(func);
+
     this.table.grantWriteData(func);
     this.table.grantReadData(func);
     this.webSocketApi.grantManageConnections(func);
@@ -702,15 +733,17 @@ export class ServerlessSpy extends Construct {
       constructName = constructName.substring(node.id.length + 1);
     }
 
+    return this.cleanName(constructName);
+  }
+
+  private cleanName(name: string) {
     //snake case to camel case including dash and first letter to upper case
-    constructName = constructName
+    return name
       .replace(/[-_]+/g, ' ')
       .replace(/[^\w\s]/g, '')
       .replace(/\s(.)/g, ($1) => $1.toUpperCase())
       .replace(/\s/g, '')
       .replace(/^(.)/, ($1) => $1.toUpperCase());
-
-    return constructName;
   }
 
   private getTopic(topicArn: string): sns.Topic | undefined {
