@@ -15,17 +15,17 @@ import { SnsSubscriptionSpyEvent } from './spyEvents/SnsSubscriptionSpyEvent';
 import { SnsTopicSpyEvent } from './spyEvents/SnsTopicSpyEvent';
 import { SpyMessage } from './spyEvents/SpyMessage';
 import { SqsSpyEvent } from './spyEvents/SqsSpyEvent';
-import iot from 'aws-iot-device-sdk';
 import { v4 } from 'uuid';
 import {
   fragment,
   getConnection,
   SSPY_TOPIC,
 } from '../listener/iot-connection';
+import { mqtt } from 'aws-iot-device-sdk-v2';
 
 export class SpyEventSender {
   debugMode = process.env[envVariableNames.SSPY_DEBUG] === 'true';
-  connection: iot.device | undefined;
+  connection: mqtt.MqttClientConnection | undefined;
   scope: string;
 
   constructor(params: {
@@ -45,7 +45,7 @@ export class SpyEventSender {
   }
 
   public async close() {
-    this.connection?.end();
+    this.connection?.disconnect();
   }
 
   public async connect() {
@@ -244,19 +244,11 @@ export class SpyEventSender {
 
     try {
       for (const fragment of this.encode(spyMessage)) {
-        await new Promise<void>((resolve) => {
-          connection.publish(
-            topic,
-            JSON.stringify(fragment),
-            {
-              qos: 1,
-            },
-            () => {
-              console.error('Publishing finished');
-              resolve();
-            }
-          );
-        });
+        await connection.publish(
+          topic,
+          JSON.stringify(fragment),
+          mqtt.QoS.AtLeastOnce
+        );
         this.log(
           `Published fragment ${fragment.index} out of ${fragment.count} to topic ${topic}`
         );

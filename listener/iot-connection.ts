@@ -1,5 +1,5 @@
 import { IoTClient, DescribeEndpointCommand } from '@aws-sdk/client-iot';
-import { iot } from 'aws-iot-device-sdk-v2';
+import { mqtt, iot, auth } from 'aws-iot-device-sdk-v2';
 
 export const SSPY_TOPIC = 'sspy';
 
@@ -19,7 +19,9 @@ function createErrorLog() {
   };
 }
 
-export async function getConnection(debugMode: boolean): Promise<iot.device> {
+export async function getConnection(
+  debugMode: boolean
+): Promise<mqtt.MqttClientConnection> {
   const log = createLog(debugMode);
   const logError = createErrorLog();
   log('Getting IoT endpoint');
@@ -41,13 +43,19 @@ export async function getConnection(debugMode: boolean): Promise<iot.device> {
     logError('No IoT endpoint could be found');
     throw new Error('IoT Endpoint address not found');
   }
+  let config_builder =
+    iot.AwsIotMqttConnectionConfigBuilder.new_with_websockets({
+      region: response.endpointAddress.split('.')[2],
+      credentials_provider: auth.AwsCredentialsProvider.newDefault(),
+    })
+      .with_keep_alive_seconds(30)
+      .with_clean_session(false)
+      .with_endpoint(response.endpointAddress)
+      .with_client_id('test-' + Math.floor(Math.random() * 100000000));
+  const config = config_builder.build();
 
-  const connection = new iot.device({
-    protocol: 'wss',
-    host: response.endpointAddress,
-    region: process.env['AWS_REGION'],
-    reconnectPeriod: 1,
-  });
+  const client = new mqtt.MqttClient();
+  const connection = client.new_connection(config);
 
   connection.on('connect', () => {
     log('IoT connected');
@@ -57,13 +65,15 @@ export async function getConnection(debugMode: boolean): Promise<iot.device> {
     logError('IoT error', err);
   });
 
-  connection.on('close', () => {
+  connection.on('closed', () => {
     log('IoT closed');
   });
 
-  connection.on('reconnect', () => {
+  connection.on('resume', () => {
     log('IoT reconnected');
   });
+
+  await connection.connect();
 
   return connection;
 }

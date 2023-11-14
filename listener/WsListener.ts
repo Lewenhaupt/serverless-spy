@@ -4,8 +4,8 @@ import { SpyMessage } from '../common/spyEvents/SpyMessage';
 import { ServerlessSpyListener } from './ServerlessSpyListener';
 import { ServerlessSpyListenerParams } from './ServerlessSpyListenerParams';
 import { WaitForParams } from './WaitForParams';
-import iot from 'aws-iot-device-sdk';
 import { fragment, getConnection, SSPY_TOPIC } from './iot-connection';
+import { mqtt } from 'aws-iot-device-sdk-v2';
 
 export class WsListener<TSpyEvents> {
   private messages: SpyMessageStorage[] = [];
@@ -16,7 +16,7 @@ export class WsListener<TSpyEvents> {
   private closed = true;
   private functionPrefix = 'waitFor';
   private debugMode = false;
-  private connection: iot.device | undefined;
+  private connection: mqtt.MqttClientConnection | undefined;
 
   private fragments = new Map<string, Map<number, fragment>>();
 
@@ -24,7 +24,10 @@ export class WsListener<TSpyEvents> {
     this.debugMode = !!params.debugMode;
     try {
       this.connection = await getConnection(this.debugMode);
-      this.connection.subscribe(`${SSPY_TOPIC}/${params.scope}`);
+      this.connection.subscribe(
+        `${SSPY_TOPIC}/${params.scope}`,
+        mqtt.QoS.AtLeastOnce
+      );
       this.closed = false;
       const connectionOpenResolve = this.connectionOpenResolve;
       this.connection.on('connect', () => {
@@ -33,7 +36,7 @@ export class WsListener<TSpyEvents> {
           connectionOpenResolve();
         }
       });
-      this.connection.on('message', (_topic, data: Buffer) => {
+      this.connection.on('message', (_topic: string, data: ArrayBuffer) => {
         if (this.closed) return;
 
         this.log('Message received', data);
@@ -72,7 +75,7 @@ export class WsListener<TSpyEvents> {
           this.resolveOldTrackerWithNewMessage(message);
         }
       });
-      this.connection.on('close', () => {
+      this.connection.on('closed', () => {
         this.log('Connection closed');
 
         this.closed = true;
@@ -91,7 +94,11 @@ export class WsListener<TSpyEvents> {
 
   public async stop() {
     this.closed = true;
-    this.connection!.end();
+    try {
+      this.connection!.disconnect();
+    } catch (e) {
+      // empty
+    }
   }
 
   private trackerMatchMessage(tracker: Tracker, message: SpyMessageStorage) {
